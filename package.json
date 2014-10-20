@@ -5,7 +5,8 @@
   "main": "index.js",
   "dependencies": {
     "event-stream": "^3.1.2",
-    "gulp-util": "^3.0.0"
+    "gulp-util": "^3.0.0",
+    "htmlencode": "0.0.4"
   },
   "devDependencies": {
     "fs-extra": "^0.12.0",

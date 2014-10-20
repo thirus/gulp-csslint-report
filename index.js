@@ -5,6 +5,7 @@ var path = require('path');
 var fs = require('fs-extra');
 var gutil = require('gulp-util');
 var util = require('util');
+var htmlencode = require('htmlencode');
 
 module.exports = function (opt) {
     "use strict";
@@ -14,17 +15,19 @@ module.exports = function (opt) {
 
     fs.ensureDir(dir);
 
-    var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     var d = new Date();
+    var i = 0;
+    var totalErrors = 0, totalFiles = 0, totalSuccess = 0;
+
     var stream = fs.createWriteStream(filename);
 
     stream.write("<!DOCTYPE html>");
     stream.write("<html>");
     stream.write("<head>");
-    stream.write('<meta charset="utf-8">');
+    stream.write('<meta charset="utf-8"/>');
     stream.write("<title>Css Lint Report</title>");
-    stream.write('<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">');
+    stream.write('<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>');
     stream.write("<style>");
     stream.write('.stat {\
                     font-weight: 800;\
@@ -88,19 +91,18 @@ module.exports = function (opt) {
         stream.write('<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>');
         stream.write("<script>");
         stream.write("$(function(){");
-        stream.write('$("#totalFilesCount").text($("#accordion .panel").length);');
-        stream.write('$("#successCount").text($("#accordion .glyphicon-ok-sign").length);');
-        stream.write('$("#errorCount").text($("#accordion .label-danger").length);');
+        stream.write(util.format('$("#totalFilesCount").text("%s");', totalFiles));
+        stream.write(util.format('$("#successCount").text("%s");', totalSuccess));
+        stream.write(util.format('$("#errorCount").text("%s");', totalErrors));
         stream.write("});");
         stream.write("</script>");
+        stream.write(util.format('<input type="hidden" name="totalErrors" value="%s" />', totalErrors));
         stream.write("</body>");
         var that = this;
-        stream.end('</html>', function() {
+        stream.end('</html>', function () {
             that.emit('end');
         });
     }
-
-    var i = 0;
 
     function startSection(st, filename, results) {
         //st.write(util.format('<section class="panel panel-%s">', results.length > 0 ? "danger" : "success"));
@@ -127,7 +129,7 @@ module.exports = function (opt) {
         st.write('<tr>');
         st.write(util.format("<td>%s</td>", err.line));
         st.write(util.format("<td>%s</td>", err.col));
-        st.write(util.format("<td>%s</td>", err.message));
+        st.write(util.format("<td>%s</td>", htmlencode.htmlEncode(err.message)));
         st.write("</tr>");
     };
 
@@ -152,7 +154,7 @@ module.exports = function (opt) {
         // only include files passed through gulp-csslint
         if (!file.csslint) return;
         this.emit('data', file);
-
+        totalFiles++;
         var results = file.csslint.results || [];
 
         var filename = dir + file.path.replace(/^.*[\\\/]/, '') + '.html';
@@ -162,6 +164,10 @@ module.exports = function (opt) {
 
         if (results.length > 0)
             gutil.log(gutil.colors.red(util.format("%s lint errors in %s", results.length, gutil.colors.magenta(fname))))
+        else
+            totalSuccess++;
+
+        totalErrors += results.length;
 
         startSection(wrStream, fname, results);
         startSection(stream, fname, results);
@@ -176,7 +182,6 @@ module.exports = function (opt) {
                 var err = result.error;
                 writeErrorMsg(wrStream, err);
                 writeErrorMsg(stream, err);
-                //gutil.log(gutil.colors.cyan(util.format("[%d, %d] %s", err.line, err.col, gutil.colors.green(err.message))));
             });
             endTable(wrStream);
             endTable(stream);
