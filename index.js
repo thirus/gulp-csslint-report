@@ -7,6 +7,8 @@ var gutil = require('gulp-util');
 var util = require('util');
 
 module.exports = function (opt) {
+    "use strict";
+    opt = opt || {};
     var dir = opt.directory || './logs/';
     var filename = dir + (opt.filename || 'csslint-report.html');
 
@@ -76,7 +78,7 @@ module.exports = function (opt) {
        <div class="val ignore-val">%s</div>\
      </div>\
   </div>\
-</div>', d.getDate() + " " + monthNames[d.getMonth()] + ", " + d.getFullYear() , d.toLocaleTimeString().replace(/([\d]+:[\d]{2})(:[\d]{2})(.*)/, "$1$3")));
+</div>', d.getDate() + " " + monthNames[d.getMonth()] + ", " + d.getFullYear(), d.toLocaleTimeString().replace(/([\d]+:[\d]{2})(:[\d]{2})(.*)/, "$1$3")));
     stream.write('<div class="panel-group" id="accordion">');
 
     function end() {
@@ -92,7 +94,10 @@ module.exports = function (opt) {
         stream.write("});");
         stream.write("</script>");
         stream.write("</body>");
-        stream.end();
+        var that = this;
+        stream.end('</html>', function() {
+            that.emit('end');
+        });
     }
 
     var i = 0;
@@ -146,6 +151,7 @@ module.exports = function (opt) {
     function start(file) {
         // only include files passed through gulp-csslint
         if (!file.csslint) return;
+        this.emit('data', file);
 
         var results = file.csslint.results || [];
 
@@ -154,7 +160,7 @@ module.exports = function (opt) {
 
         var wrStream = fs.createWriteStream(filename);
 
-        if(results.length > 0)
+        if (results.length > 0)
             gutil.log(gutil.colors.red(util.format("%s lint errors in %s", results.length, gutil.colors.magenta(fname))))
 
         startSection(wrStream, fname, results);
@@ -166,7 +172,7 @@ module.exports = function (opt) {
         } else {
             startTable(stream);
             startTable(wrStream);
-            results.forEach(function(result, i) {
+            results.forEach(function (result, i) {
                 var err = result.error;
                 writeErrorMsg(wrStream, err);
                 writeErrorMsg(stream, err);
