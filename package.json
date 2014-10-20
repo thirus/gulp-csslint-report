@@ -1,0 +1,36 @@
+{
+  "name": "gulp-csslint-report",
+  "version": "1.0.0",
+  "description": "Glup plugin to generate HTML report from the csslint results",
+  "main": "index.js",
+  "dependencies": {
+    "event-stream": "^3.1.2",
+    "gulp-util": "^3.0.0"
+  },
+  "devDependencies": {
+    "gulp-csslint": "^0.1.5",
+    "mocha": "^1.18.2",
+    "should": "^3.3.1"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thirus/gulp-csslint-report.git"
+  },
+  "keywords": [
+    "gulpplugin",
+    "csslint",
+    "reports"
+  ],
+  "author": "thirus",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/thirus/gulp-csslint-report/issues"
+  },
+  "homepage": "https://github.com/thirus/gulp-csslint-report"
+}
