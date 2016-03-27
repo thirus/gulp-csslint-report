@@ -4,7 +4,7 @@
 
 ## Usage
 
-First, do a install `gulp-csslint` as a development dependency:
+First, do a install [gulp-csslint] as a development dependency:
 
 ```
 npm install --save-dev gulp-csslint
@@ -47,3 +47,5 @@ gulp.src('client/css/*.css')
 ```
 
 Defaults are: {'filename': 'csslint-report.html', 'directory': './logs/'}
+
+[gulp-csslint]: https://www.npmjs.com/package/gulp-csslint
