@@ -1,5 +1,4 @@
-gulp-csslint-report
-===================
+# gulp-csslint-report
 
 > Generates HTML report from the csslint results
 
@@ -9,6 +8,12 @@ First, do a install `gulp-csslint` as a development dependency:
 
 ```
 npm install --save-dev gulp-csslint
+```
+
+Then, install the reporter:
+
+```
+npm install --save-dev gulp-csslint-report
 ```
 
 Then, add it to your gulpfile.js:
@@ -35,7 +40,10 @@ You can pass the output filename (consolidated report) and individual css file r
 ```javascript
 gulp.src('client/css/*.css')
   .pipe(csslint())
-  .pipe(reporter({'filename': 'consolidated-csslint-report.html', 'directory': './csslint-reports/'}));
+  .pipe(reporter({
+      'filename': 'index.html', 
+      'directory': './csslint-reports/'
+  }));
 ```
 
 Defaults are: {'filename': 'csslint-report.html', 'directory': './logs/'}
