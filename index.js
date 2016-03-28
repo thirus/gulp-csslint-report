@@ -13,7 +13,7 @@ module.exports = function (opt) {
     var dir = opt.directory || './logs/';
     var filename = dir + (opt.filename || 'csslint-report.html');
 
-    fs.ensureDir(dir);
+    fs.ensureDirSync(dir);
 
     var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     var d = new Date();
