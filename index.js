@@ -1,6 +1,6 @@
-﻿"use strict";
+"use strict";
 
-var through = require('through');
+var through = require('through2');
 var path = require('path');
 var fs = require('fs-extra');
 var gutil = require('gulp-util');
@@ -35,7 +35,7 @@ module.exports = function (opt) {
                     font-size: 0.85em;\
                     color: #6F6F6F;\
                 }' +
-                '.val {\
+        '.val {\
                     font-size: 38px;\
                     font-weight: bold;\
                     margin-top: -10px;\
@@ -84,7 +84,7 @@ module.exports = function (opt) {
 </div>', d.getDate() + " " + monthNames[d.getMonth()] + ", " + d.getFullYear(), d.toLocaleTimeString().replace(/([\d]+:[\d]{2})(:[\d]{2})(.*)/, "$1$3")));
     stream.write('<div class="panel-group" id="accordion">');
 
-    function end() {
+    function end(cb) {
         stream.write("</div>");
         stream.write("</div>");
         stream.write('<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>');
@@ -98,9 +98,9 @@ module.exports = function (opt) {
         stream.write("</script>");
         stream.write(util.format('<input type="hidden" name="totalErrors" value="%s" />', totalErrors));
         stream.write("</body>");
-        var that = this;
-        stream.end('</html>', function () {
-            that.emit('end');
+        stream.write('</html>');
+        stream.end(null, function () {
+            cb();
         });
     }
 
@@ -150,12 +150,13 @@ module.exports = function (opt) {
         st.write("</table>");
     }
 
-    function start(file) {
+    function start(file, encoding, callback) {
         // only include files passed through gulp-csslint
-        if (!file.csslint) return;
-        this.emit('data', file);
+        if (file.isNull() || !file.csslint) {
+            return callback(null, file);
+        }
         totalFiles++;
-        var results = file.csslint.results || [];
+        var results = file.csslint.report.messages || [];
 
         var filename = dir + file.path.replace(/^.*[\\\/]/, '') + '.html';
         var fname = path.basename(file.path);
@@ -178,8 +179,7 @@ module.exports = function (opt) {
         } else {
             startTable(stream);
             startTable(wrStream);
-            results.forEach(function (result, i) {
-                var err = result.error;
+            results.forEach(function (err, i) {
                 writeErrorMsg(wrStream, err);
                 writeErrorMsg(stream, err);
             });
@@ -189,9 +189,9 @@ module.exports = function (opt) {
 
         endSection(wrStream);
         endSection(stream);
-
         wrStream.end();
+        callback(null, file);
     };
 
-    return through(start, end);
+    return through.obj(start, end).resume();
 };
