@@ -1,6 +1,6 @@
 {
   "name": "gulp-csslint-report",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "Glup plugin to generate HTML report from the csslint results",
   "main": "index.js",
   "dependencies": {
