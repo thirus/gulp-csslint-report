@@ -40,8 +40,8 @@ You can pass the output filename (consolidated report) and individual css file r
 ```javascript
 gulp.src('client/css/*.css')
   .pipe(csslint())
-  .pipe(reporter({
-      'filename': 'index.html', 
+  .pipe(htmlReporter({
+      'filename': 'index.html',
       'directory': './csslint-reports/'
   }));
 ```
